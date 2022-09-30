@@ -111,6 +111,8 @@ func main() {
 			}
 			//	fmt.Println(listObject())
 	*/
+	var newestFile string
+	var newestTime int64 = 0
 	fmt.Print("Enter file_path (example mariadb_backup/): ")
 	var folder_path string
 	fmt.Scanf("%s", &folder_path)
@@ -129,13 +131,30 @@ func main() {
 	files, _ := ioutil.ReadDir(folder_path)
 
 	fmt.Println(files)
-	for _, file := range files {
-		if file.IsDir() {
-			continue
-		} else {
-			uploadObject(folder_path + file.Name())
-			log.Println("UPLOAD FILE MARIADB_BACKUP DONE")
+
+	/*	for _, file := range files {
+			if file.IsDir() {
+				continue
+			} else {
+
+				uploadObject(folder_path + newestFile)
+				log.Println("UPLOAD FILE MARIADB_BACKUP DONE")
+			}
+		}
+	*/
+	for _, f := range files {
+		fi, err := os.Stat(folder_path + f.Name())
+		if err != nil {
+			fmt.Println(err)
+		}
+		currTime := fi.ModTime().Unix()
+		if currTime > newestTime {
+			newestTime = currTime
+			newestFile = f.Name()
 		}
 	}
+	fmt.Println(newestFile)
+	uploadObject(folder_path + newestFile)
+	log.Println("UPLOAD FILE MARIADB_BACKUP DONE")
 
 }
